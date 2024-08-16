@@ -1,0 +1,10 @@
+base:
+  random_seed: 42
+dataset:
+  test_size: 0.2
+model:
+  multi_class: 'multinomial'
+  max_iter: 100
+  hyper_params:
+    C: 0.001
+    solver: 'lbfgs'
