@@ -1,0 +1,142 @@
+schema: '2.0'
+stages:
+  data_load:
+    cmd: python src/stages/data_load.py --config params.yaml
+    deps:
+    - path: src/stages/data_load.py
+      hash: md5
+      md5: 91d9d7fa5d825cdd47ab3d40aca47f38
+      size: 831
+    params:
+      params.yaml:
+        data:
+          raw_data_path: data/raw/raw.csv
+          processed_data_path: data/processed/processed.csv
+    outs:
+    - path: data/raw/raw.csv
+      hash: md5
+      md5: 4224576f0267bf88902f87f0f6200967
+      size: 2757
+  featurize:
+    cmd: python src/stages/featurize.py --config params.yaml
+    deps:
+    - path: data/raw/raw.csv
+      hash: md5
+      md5: 4224576f0267bf88902f87f0f6200967
+      size: 2757
+    - path: src/stages/featurize.py
+      hash: md5
+      md5: 4422b201f61a84fb79a510cec1fadad8
+      size: 1129
+    params:
+      params.yaml:
+        data:
+          raw_data_path: data/raw/raw.csv
+          processed_data_path: data/processed/processed.csv
+    outs:
+    - path: data/processed/processed.csv
+      hash: md5
+      md5: 25db0ac33076e034b684b260e533fa17
+      size: 7751
+  data_split:
+    cmd: python src/stages/data_split.py --config params.yaml
+    deps:
+    - path: data/processed/processed.csv
+      hash: md5
+      md5: 25db0ac33076e034b684b260e533fa17
+      size: 7751
+    - path: src/stages/data_split.py
+      hash: md5
+      md5: e40f0557a58d031e494fdbd60f463176
+      size: 978
+    params:
+      params.yaml:
+        data:
+          raw_data_path: data/raw/raw.csv
+          processed_data_path: data/processed/processed.csv
+        data_split:
+          test_size: 0.2
+          train_set_path: data/processed/train.csv
+          test_set_path: data/processed/test.csv
+    outs:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 01b86b007b24d23c8f0683b1140ccae2
+      size: 1704
+    - path: data/processed/train.csv
+      hash: md5
+      md5: d3911c3291357d50058b65b41dd97b55
+      size: 6516
+  train:
+    cmd: python src/stages/train.py --config params.yaml
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 01b86b007b24d23c8f0683b1140ccae2
+      size: 1704
+    - path: data/processed/train.csv
+      hash: md5
+      md5: d3911c3291357d50058b65b41dd97b55
+      size: 6516
+    - path: src/stages/train.py
+      hash: md5
+      md5: 14a9ef4832ec742c4e3cced88893cdc1
+      size: 1274
+    params:
+      params.yaml:
+        data_split:
+          test_size: 0.2
+          train_set_path: data/processed/train.csv
+          test_set_path: data/processed/test.csv
+        model:
+          multi_class: multinomial
+          max_iter: 100
+          hyper_params:
+            C: 0.001
+            solver: lbfgs
+          model_path: models/log_reg.sav
+    outs:
+    - path: models/log_reg.sav
+      hash: md5
+      md5: f341febc0fd0e2d0c18c7b1db8a8de09
+      size: 1039
+  evaluate:
+    cmd: python src/stages/evaluate.py --config params.yaml
+    deps:
+    - path: data/processed/test.csv
+      hash: md5
+      md5: 01b86b007b24d23c8f0683b1140ccae2
+      size: 1704
+    - path: models/log_reg.sav
+      hash: md5
+      md5: f341febc0fd0e2d0c18c7b1db8a8de09
+      size: 1039
+    params:
+      params.yaml:
+        data_split:
+          test_size: 0.2
+          train_set_path: data/processed/train.csv
+          test_set_path: data/processed/test.csv
+        labels:
+        - setosa
+        - versicolor
+        - virginica
+        model:
+          multi_class: multinomial
+          max_iter: 100
+          hyper_params:
+            C: 0.001
+            solver: lbfgs
+          model_path: models/log_reg.sav
+        reports:
+          metrics_file: reports/metrics.json
+          confusion_matrix_image: reports/confusion_matrix.png
+    outs:
+    - path: reports/confusion_matrix.png
+      hash: md5
+      md5: bca8dcc1ecbd3accffc81db42b797d8f
+      size: 24920
+    - path: reports/metrics.json
+      hash: md5
+      md5: 4d9d1f9a7ac4184659b5833093abe456
+      size: 17

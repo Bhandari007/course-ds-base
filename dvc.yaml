@@ -7,3 +7,51 @@ stages:
     - data
     outs:
     - data/raw/raw.csv
+
+  featurize:
+    cmd: python src/stages/featurize.py --config params.yaml
+    deps:
+    - src/stages/featurize.py
+    - data/raw/raw.csv
+    params:
+    - data
+    outs:
+    - data/processed/processed.csv
+
+  data_split:
+    cmd: python src/stages/data_split.py --config params.yaml
+    deps:
+    - src/stages/data_split.py
+    - data/processed/processed.csv
+    params:
+    - data
+    - data_split
+    outs:
+    - data/processed/train.csv
+    - data/processed/test.csv
+
+  train:
+    cmd: python src/stages/train.py --config params.yaml
+    deps:
+    - src/stages/train.py
+    - data/processed/train.csv
+    - data/processed/test.csv
+    params:
+    - data_split
+    - model
+    outs:
+    - models/log_reg.sav
+
+  evaluate:
+    cmd: python src/stages/evaluate.py --config params.yaml
+    deps:
+    - data/processed/test.csv 
+    - models/log_reg.sav 
+    params:
+    - data_split
+    - model
+    - reports
+    - labels 
+    outs:
+    - reports/metrics.json
+    - reports/confusion_matrix.png
