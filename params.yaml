@@ -1,10 +1,24 @@
 base:
   random_seed: 42
-dataset:
+labels: ['setosa', 'versicolor', 'virginica']
+data:
+  raw_data_path: 'data/raw/raw.csv'
+  processed_data_path: 'data/processed/processed.csv'
+
+data_split:
   test_size: 0.2
+  train_set_path: 'data/processed/train.csv'
+  test_set_path: 'data/processed/test.csv'
+
 model:
   multi_class: 'multinomial'
   max_iter: 100
   hyper_params:
     C: 0.001
     solver: 'lbfgs'
+  model_path: 'models/log_reg.sav'
+
+reports:
+  metrics_file: 'reports/metrics.json'
+  confusion_matrix_image: 'reports/confusion_matrix.png'
+
