@@ -8,6 +8,7 @@ import joblib
 from sklearn.metrics import confusion_matrix, f1_score
 import json
 import argparse
+from loguru import logger
 
 def plot_confusion_matrix(cm,
                           target_names,
@@ -97,6 +98,7 @@ def evaluate(config_path:Text)->None:
 
     # Load Model
     loaded_model = joblib.load(config["model"]["model_path"])
+    logger.info("Model Loaded")
     prediction = loaded_model.predict(X_test)
     cm = confusion_matrix(prediction, y_test)
     f1 = f1_score(y_true = y_test, y_pred = prediction, average='macro')
@@ -114,6 +116,7 @@ def evaluate(config_path:Text)->None:
 
     cm_plot = plot_confusion_matrix(cm,config["labels"], normalize=False)
     cm_plot.savefig(config['reports']['confusion_matrix_image'])
+    logger.info("Evaluation Finished.")
 
 if __name__=="__main__":
     arg_parser = argparse.ArgumentParser()
