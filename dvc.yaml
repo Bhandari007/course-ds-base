@@ -1,0 +1,9 @@
+stages:
+  data_load:
+    cmd: python src/stages/data_load.py --config params.yaml
+    deps:
+    - src/stages/data_load.py
+    params:
+    - data
+    outs:
+    - data/raw/raw.csv
